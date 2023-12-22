@@ -61,6 +61,9 @@ impl Dispatcher {
                                     KeyCode::Backspace => {
                                         state.remove_last_entry();
                                     }
+                                    KeyCode::Enter => {
+                                        state.process_input();
+                                    }
                                     KeyCode::Esc => {
                                         ui_state_tx
                                             .send(Message::Terminate)

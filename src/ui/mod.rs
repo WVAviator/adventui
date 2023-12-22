@@ -1,5 +1,5 @@
 use std::{
-    io::{stdout, Stdout},
+    io::stdout,
     sync::{mpsc::Receiver, Arc, Mutex},
     thread::JoinHandle,
 };

@@ -1,7 +1,4 @@
-use std::{
-    io::stdout,
-    sync::{Arc, Mutex},
-};
+use std::io::stdout;
 
 use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
@@ -9,8 +6,6 @@ use crossterm::{
 };
 use dispatcher::Dispatcher;
 use message::Message;
-
-use ratatui::prelude::{CrosstermBackend, Terminal};
 
 use ui::UI;
 
