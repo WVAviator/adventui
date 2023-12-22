@@ -1,12 +1,17 @@
-pub struct MainMenuState<'a> {
-    options: Vec<&'a str>,
+pub struct MainMenuState {
+    options: Vec<String>,
     selection: usize,
 }
 
-impl<'a> MainMenuState<'a> {
+impl MainMenuState {
     pub fn new() -> Self {
         MainMenuState {
-            options: vec!["New Game", "Continue", "Settings", "Quit"],
+            options: vec![
+                String::from("New Game"),
+                String::from("Continue"),
+                String::from("Settings"),
+                String::from("Quit"),
+            ],
             selection: 0,
         }
     }

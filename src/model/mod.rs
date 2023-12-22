@@ -1,15 +1,15 @@
-use self::{main_menu_state::MainMenuState, game_state::GameState};
+use self::{game_state::GameState, main_menu_state::MainMenuState};
 
 mod game_state;
 mod main_menu_state;
 
-pub enum Model<'a> {
-    MainMenu(MainMenuState<'a>),
-    Game(GameState<'a>)
+pub enum Model {
+    MainMenu(MainMenuState),
+    Game(GameState),
 }
 
-impl<'a> Model<'a> {
+impl Model {
     pub fn new() -> Self {
-        Model::MainMenu(MainMenuState::new())w
+        Model::MainMenu(MainMenuState::new())
     }
 }

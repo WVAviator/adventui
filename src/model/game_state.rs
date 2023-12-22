@@ -1,17 +1,17 @@
-pub struct GameState<'a> {
-    inventory: Vec<&'a str>,
-    scene_name: &'a str,
-    scene_desc: &'a str,
+pub struct GameState {
+    inventory: Vec<String>,
+    scene_name: String,
+    scene_desc: String,
     user_entry: String,
-    scene_history: Vec<&'a str>,
+    scene_history: Vec<String>,
 }
 
-impl<'a> GameState<'a> {
+impl GameState {
     pub fn new() -> Self {
         GameState {
             inventory: Vec::new(),
-            scene_name: "New Game",
-            scene_desc: "Loading...",
+            scene_name: String::from("New Game"),
+            scene_desc: String::from("Loading..."),
             user_entry: String::new(),
             scene_history: Vec::new(),
         }

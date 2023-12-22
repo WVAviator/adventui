@@ -11,6 +11,7 @@ use ratatui::{
 };
 
 mod model;
+mod ui;
 
 fn main() -> std::io::Result<()> {
     stdout().execute(EnterAlternateScreen)?;
