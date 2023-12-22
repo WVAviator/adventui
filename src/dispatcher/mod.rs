@@ -2,6 +2,7 @@ use crossterm::event::{self, KeyCode, KeyEventKind};
 use std::{sync::mpsc::Sender, thread::JoinHandle};
 
 use crate::{
+    game_loader::GameLoader,
     message::Message,
     model::{game_state::GameState, Model},
 };
@@ -11,7 +12,11 @@ pub struct Dispatcher {
 }
 
 impl Dispatcher {
-    pub fn new(app_state_tx: Sender<Message>, ui_state_tx: Sender<Message>) -> Self {
+    pub fn new(
+        app_state_tx: Sender<Message>,
+        ui_state_tx: Sender<Message>,
+        loader: GameLoader,
+    ) -> Self {
         let join_handle = std::thread::spawn(move || {
             let mut model = Model::new();
             ui_state_tx
@@ -62,7 +67,9 @@ impl Dispatcher {
                                         state.remove_last_entry();
                                     }
                                     KeyCode::Enter => {
-                                        state.process_input();
+                                        let response = loader.process_input(state.get_user_entry());
+                                        state.push_input_to_history();
+                                        state.append_scene_history(response);
                                     }
                                     KeyCode::Up => {
                                         state.scroll_up(1);

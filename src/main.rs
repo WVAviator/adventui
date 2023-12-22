@@ -5,11 +5,13 @@ use crossterm::{
     ExecutableCommand,
 };
 use dispatcher::Dispatcher;
+use game_loader::GameLoader;
 use message::Message;
 
 use ui::UI;
 
 mod dispatcher;
+mod game_loader;
 mod message;
 mod model;
 mod ui;
@@ -18,11 +20,13 @@ fn main() -> std::io::Result<()> {
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;
 
+    let loader = GameLoader::new();
+
     let (app_state_tx, app_state_rx) = std::sync::mpsc::channel();
     let (ui_state_tx, ui_state_rx) = std::sync::mpsc::channel();
 
     let mut ui = UI::new(ui_state_rx);
-    let mut dispatcher = Dispatcher::new(app_state_tx, ui_state_tx);
+    let mut dispatcher = Dispatcher::new(app_state_tx, ui_state_tx, loader);
 
     loop {
         match app_state_rx.recv() {

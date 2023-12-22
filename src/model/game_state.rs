@@ -33,7 +33,7 @@ impl GameState {
         self.user_entry.pop();
     }
 
-    pub fn process_input(&mut self) {
+    pub fn push_input_to_history(&mut self) {
         self.append_scene_history(format!("> {}", self.user_entry.clone()));
         self.user_entry.clear();
     }
