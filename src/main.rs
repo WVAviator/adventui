@@ -10,6 +10,7 @@ use message::Message;
 
 use ui::UI;
 
+mod action;
 mod dispatcher;
 mod game_loader;
 mod message;
