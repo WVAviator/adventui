@@ -23,16 +23,10 @@ fn main() -> std::io::Result<()> {
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;
 
-    let mut terminal =
-        Terminal::new(CrosstermBackend::new(stdout())).expect("Unable to create terminal UI.");
-    terminal.clear().expect("Failed to clear terminal.");
-
-    let terminal = Arc::new(Mutex::new(terminal));
-
     let (app_state_tx, app_state_rx) = std::sync::mpsc::channel();
     let (ui_state_tx, ui_state_rx) = std::sync::mpsc::channel();
 
-    let mut ui = UI::new(ui_state_rx, terminal.clone());
+    let mut ui = UI::new(ui_state_rx);
     let mut dispatcher = Dispatcher::new(app_state_tx, ui_state_tx);
 
     loop {
