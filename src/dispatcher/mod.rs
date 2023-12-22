@@ -64,6 +64,18 @@ impl Dispatcher {
                                     KeyCode::Enter => {
                                         state.process_input();
                                     }
+                                    KeyCode::Up => {
+                                        state.scroll_up(1);
+                                    }
+                                    KeyCode::Down => {
+                                        state.scroll_down(1);
+                                    }
+                                    KeyCode::PageUp => {
+                                        state.scroll_up(10);
+                                    }
+                                    KeyCode::PageDown => {
+                                        state.scroll_down(10);
+                                    }
                                     KeyCode::Esc => {
                                         ui_state_tx
                                             .send(Message::Terminate)

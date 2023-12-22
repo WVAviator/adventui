@@ -4,7 +4,9 @@ pub struct GameState {
     scene_name: String,
     scene_desc: String,
     user_entry: String,
+    entry_enabled: bool,
     scene_history: Vec<String>,
+    scroll_position: usize,
 }
 
 impl GameState {
@@ -14,7 +16,9 @@ impl GameState {
             scene_name: String::from("New Game"),
             scene_desc: String::from("You are in a dark room. There is a door to the north. There is a door to the south. There is a door to the east. There is a door to the west. There is a door to the up. There is a door to the down. There is a door to the northeast. There is a door to the northwest. There is a door to the southeast. There is a door to the southwest. There is a door to the in. There is a door to the out. There is a door to the left."),
             user_entry: String::new(),
+            entry_enabled: true,
             scene_history: Vec::new(),
+            scroll_position: 0,
         }
     }
 
@@ -30,9 +34,33 @@ impl GameState {
     }
 
     pub fn process_input(&mut self) {
-        self.scene_history
-            .push(format!("> {}", self.user_entry.clone()));
+        self.append_scene_history(format!("> {}", self.user_entry.clone()));
         self.user_entry.clear();
+    }
+
+    pub fn append_scene_history(&mut self, s: String) {
+        self.scene_history.push(s);
+        self.scroll_reset();
+    }
+
+    pub fn scroll_up(&mut self, amount: usize) {
+        self.scroll_position += amount;
+    }
+
+    pub fn scroll_down(&mut self, amount: usize) {
+        if amount > self.scroll_position {
+            self.scroll_position = 0;
+            return;
+        }
+        self.scroll_position -= amount;
+    }
+
+    pub fn get_scroll_position(&self) -> usize {
+        self.scroll_position
+    }
+
+    pub fn scroll_reset(&mut self) {
+        self.scroll_position = 0;
     }
 
     pub fn get_user_entry(&self) -> &str {

@@ -77,9 +77,17 @@ impl GameRenderer {
                 let max_history_items =
                     min(vertical_chunks[1].height - 2, history_items.len() as u16) as usize;
 
+                let skip_lines = std::cmp::max(
+                    0,
+                    history_items.len() as isize
+                        - state.get_scroll_position() as isize
+                        - max_history_items as isize,
+                ) as usize;
+
                 let history_items: Vec<ListItem> = history_items
                     .iter()
-                    .skip(history_items.len() - max_history_items)
+                    .skip(skip_lines)
+                    .take(max_history_items)
                     .map(|item| ListItem::new(Text::raw(item)))
                     .collect();
 
