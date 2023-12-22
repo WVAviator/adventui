@@ -1,3 +1,4 @@
+#[derive(Debug, Clone, PartialEq)]
 pub struct GameState {
     inventory: Vec<String>,
     scene_name: String,
