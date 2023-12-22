@@ -5,8 +5,11 @@ use std::{
 };
 
 use ratatui::{
+    layout::{Constraint, Direction, Layout},
     prelude::{CrosstermBackend, Stylize, Terminal},
-    widgets::Paragraph,
+    style::Color,
+    text::Text,
+    widgets::{Block, Borders, List, ListItem, Paragraph},
 };
 
 use crate::{message::Message, model::Model};
@@ -22,21 +25,36 @@ impl UI {
     ) -> Self {
         let join_handle = std::thread::spawn(move || loop {
             match model_update_rx.recv() {
-                Ok(Message::StateUpdate(Model::MainMenu(model))) => {
+                Ok(Message::StateUpdate(Model::MainMenu(state))) => {
                     let mut terminal = terminal
                         .lock()
                         .expect("Unable to get lock on terminal for UI rendering.");
                     terminal
                         .draw(|frame| {
-                            let area = frame.size();
-                            frame.render_widget(
-                                Paragraph::new("Main menu! Yay!").white().on_blue(),
-                                area,
-                            );
+                            let items: Vec<ListItem> = state
+                                .get_options()
+                                .iter()
+                                .enumerate()
+                                .map(|(i, item)| {
+                                    if i == state.get_selection_index() {
+                                        ListItem::new(Text::styled(
+                                            item,
+                                            ratatui::style::Style::default().fg(Color::Yellow), // Highlight style
+                                        ))
+                                    } else {
+                                        ListItem::new(Text::raw(item))
+                                    }
+                                })
+                                .collect();
+
+                            let list =
+                                List::new(items).block(Block::default().borders(Borders::ALL)); // Optional border
+
+                            frame.render_widget(list, frame.size());
                         })
                         .expect("Failed to draw menu frame.");
                 }
-                Ok(Message::StateUpdate(Model::Game(model))) => {
+                Ok(Message::StateUpdate(Model::Game(state))) => {
                     let mut terminal = terminal
                         .lock()
                         .expect("Unable to get lock on terminal for UI rendering.");
@@ -44,7 +62,7 @@ impl UI {
                         .draw(|frame| {
                             let area = frame.size();
                             frame.render_widget(
-                                Paragraph::new("Game! Yay!").white().on_blue(),
+                                Paragraph::new(state.get_user_entry()).white(),
                                 area,
                             );
                         })

@@ -14,31 +14,71 @@ impl Dispatcher {
     pub fn new(app_state_tx: Sender<Message>, ui_state_tx: Sender<Message>) -> Self {
         let join_handle = std::thread::spawn(move || {
             let mut model = Model::new();
+            ui_state_tx
+                .send(Message::StateUpdate(model.clone()))
+                .expect("Failed to initialize application state for UI.");
             loop {
                 if let event::Event::Key(key) =
                     event::read().expect("Failed to read event keypress.")
                 {
-                    if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('m') {
-                        model = Model::MainMenu(MainMenuState::new());
-                        ui_state_tx
-                            .send(Message::StateUpdate(model.clone()))
-                            .expect("Failed to dispatch model update.");
+                    match &mut model {
+                        Model::MainMenu(state) => {
+                            if key.kind == KeyEventKind::Press {
+                                match key.code {
+                                    KeyCode::Char('j') | KeyCode::Down => {
+                                        state.select_next();
+                                    }
+                                    KeyCode::Char('k') | KeyCode::Up => {
+                                        state.select_prev();
+                                    }
+                                    KeyCode::Enter => match state.get_selection() {
+                                        "New Game" => {
+                                            model = Model::Game(GameState::new());
+                                        }
+                                        _ => {
+                                            unimplemented!("Main menu option not implemented yet.")
+                                        }
+                                    },
+                                    KeyCode::Esc => {
+                                        ui_state_tx
+                                            .send(Message::Terminate)
+                                            .expect("Failed to send UI terminate message.");
+                                        app_state_tx.send(Message::Terminate).expect(
+                                            "Failed to send application terminate message.",
+                                        );
+                                        break;
+                                    }
+                                    _ => {}
+                                }
+                            }
+                        }
+                        Model::Game(state) => {
+                            if key.kind == KeyEventKind::Press {
+                                match key.code {
+                                    KeyCode::Char(c) => {
+                                        state.append_entry(c);
+                                    }
+                                    KeyCode::Backspace => {
+                                        state.remove_last_entry();
+                                    }
+                                    KeyCode::Esc => {
+                                        ui_state_tx
+                                            .send(Message::Terminate)
+                                            .expect("Failed to send UI terminate message.");
+                                        app_state_tx.send(Message::Terminate).expect(
+                                            "Failed to send application terminate message.",
+                                        );
+                                        break;
+                                    }
+                                    _ => {}
+                                }
+                            }
+                        }
                     }
-                    if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('g') {
-                        model = Model::Game(GameState::new());
-                        ui_state_tx
-                            .send(Message::StateUpdate(model.clone()))
-                            .expect("Failed to dispatch model update.");
-                    }
-                    if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('q') {
-                        ui_state_tx
-                            .send(Message::Terminate)
-                            .expect("Failed to send UI terminate message.");
-                        app_state_tx
-                            .send(Message::Terminate)
-                            .expect("Failed to send application terminate message.");
-                        break;
-                    }
+
+                    ui_state_tx
+                        .send(Message::StateUpdate(model.clone()))
+                        .expect("Failed to send updated state to UI.");
                 }
             }
         });

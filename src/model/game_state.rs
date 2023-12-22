@@ -17,4 +17,16 @@ impl GameState {
             scene_history: Vec::new(),
         }
     }
+
+    pub fn append_entry(&mut self, c: char) {
+        self.user_entry += &c.to_string();
+    }
+
+    pub fn remove_last_entry(&mut self) {
+        self.user_entry.pop();
+    }
+
+    pub fn get_user_entry(&self) -> &str {
+        &self.user_entry
+    }
 }
