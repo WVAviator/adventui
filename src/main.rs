@@ -10,6 +10,8 @@ use ratatui::{
     widgets::Paragraph,
 };
 
+mod model;
+
 fn main() -> std::io::Result<()> {
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;
