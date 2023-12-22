@@ -3,7 +3,7 @@ use std::{sync::mpsc::Sender, thread::JoinHandle};
 
 use crate::{
     message::Message,
-    model::{game_state::GameState, main_menu_state::MainMenuState, Model},
+    model::{game_state::GameState, Model},
 };
 
 pub struct Dispatcher {
