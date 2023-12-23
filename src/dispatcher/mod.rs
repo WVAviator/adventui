@@ -16,14 +16,29 @@ impl Dispatcher {
     pub fn new(
         app_state_tx: Sender<Message>,
         ui_state_tx: Sender<Message>,
-        loader: GameLoader,
+        mut loader: GameLoader,
     ) -> Self {
         let join_handle = std::thread::spawn(move || {
             let mut model = Model::new();
+            let mut is_new_game = false;
             ui_state_tx
                 .send(Message::StateUpdate(model.clone()))
                 .expect("Failed to initialize application state for UI.");
             loop {
+                if is_new_game {
+                    is_new_game = false;
+                    if let Model::Game(state) = &mut model {
+                        let action = loader.process_input("start game", state);
+                        if let Action::NewScene { name, desc } = action {
+                            state.new_scene(name, desc);
+                            state.enable_entry();
+                        }
+                    }
+                    ui_state_tx
+                        .send(Message::StateUpdate(model.clone()))
+                        .expect("Failed to send updated state to UI.");
+                    continue;
+                }
                 if let event::Event::Key(key) =
                     event::read().expect("Failed to read event keypress.")
                 {
@@ -40,6 +55,7 @@ impl Dispatcher {
                                     KeyCode::Enter => match state.get_selection() {
                                         "New Game" => {
                                             model = Model::Game(GameState::new());
+                                            is_new_game = true;
                                         }
                                         _ => {
                                             unimplemented!("Main menu option not implemented yet.")
@@ -68,23 +84,28 @@ impl Dispatcher {
                                         state.remove_last_entry();
                                     }
                                     KeyCode::Enter => {
+                                        state.disable_entry();
                                         let action: Action =
-                                            loader.process_input(state.get_user_entry());
+                                            loader.process_input(&state.get_user_entry(), &state);
                                         state.push_input_to_history();
                                         match action {
                                             Action::NewScene { name, desc } => {
                                                 state.new_scene(name, desc);
+                                                state.enable_entry();
                                             }
                                             Action::AddToInventory { item, message } => {
                                                 state.add_to_inventory(item);
                                                 state.append_scene_history(message);
+                                                state.enable_entry();
                                             }
                                             Action::RemoveFromInventory { item, message } => {
                                                 state.remove_from_inventory(item);
                                                 state.append_scene_history(message);
+                                                state.enable_entry();
                                             }
                                             Action::Information { message } => {
                                                 state.append_scene_history(message);
+                                                state.enable_entry();
                                             }
                                             Action::EndGame { message } => {
                                                 state.append_scene_history(message);

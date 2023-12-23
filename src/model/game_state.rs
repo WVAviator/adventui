@@ -14,7 +14,7 @@ impl GameState {
         GameState {
             inventory: Vec::new(),
             scene_name: String::from("New Game"),
-            scene_desc: String::from("You are in a dark room. There is a door to the north. There is a door to the south. There is a door to the east. There is a door to the west. There is a door to the up. There is a door to the down. There is a door to the northeast. There is a door to the northwest. There is a door to the southeast. There is a door to the southwest. There is a door to the in. There is a door to the out. There is a door to the left."),
+            scene_desc: String::from("Loading..."),
             user_entry: String::new(),
             entry_enabled: true,
             scene_history: Vec::new(),
@@ -62,7 +62,6 @@ impl GameState {
     pub fn new_scene(&mut self, name: String, desc: String) {
         self.scene_name = name;
         self.scene_desc = desc;
-        self.entry_enabled = true;
         self.scene_history.clear();
         self.scroll_reset();
     }
@@ -73,6 +72,10 @@ impl GameState {
 
     pub fn remove_from_inventory(&mut self, item: String) {
         self.inventory.retain(|i| i != &item);
+    }
+
+    pub fn enable_entry(&mut self) {
+        self.entry_enabled = true;
     }
 
     pub fn disable_entry(&mut self) {
