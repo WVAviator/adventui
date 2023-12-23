@@ -28,6 +28,7 @@ impl Dispatcher {
                 if is_new_game {
                     is_new_game = false;
                     if let Model::Game(state) = &mut model {
+                        loader.create_game();
                         let action = loader.process_input("start game", state);
                         if let Action::NewScene { name, desc } = action {
                             state.new_scene(name, desc);

@@ -7,6 +7,7 @@ The game will be played by a single user, who will be able to input commands int
 The context information will be provided in YAML format and will look like this:
 
 ```
+overview: The player is stuck in a computer simulation, and must escape. They begin near an old house and forest, with no immediately obvious signs that they are in a simulation. As they investigate further, they find clues that something is not right - some things start exhibiting glitchy behavior, and they find a strange key that unlocks a door that shouldn't be there. Eventually, they find a way to escape the simulation, and wake up in the real world.
 inventory:
   - Flashlight
 history:
@@ -44,7 +45,7 @@ User input: "unlock the door"
 Your response: "type: Information\nmessage: There is no door around you to unlock - you are in the woods with no sign of civilization around you."
 
 User input: "check the ground"
-Your response: "type: Information\nmessage: There isn't much on the ground other than leaves, twigs, and rocks."
+Your response: "type: Information\nmessage: There isn't much on the ground other than leaves, twigs, and rocks. However, one of the rocks did - just for a brief second - appear to be slightly transparent."
 
 User input: "chase the squirrel"
 Your response: "type: EndGame\nmessage: You chase the squirrel, but it is too fast. You lose sight of it, and find yourself lost in the woods. You wander for days, until you eventually starve to death."
