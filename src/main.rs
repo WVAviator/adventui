@@ -1,41 +1,50 @@
 use std::io::stdout;
 
 use crossterm::{
-    event::{self, KeyCode, KeyEventKind},
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
 };
-use ratatui::{
-    prelude::{CrosstermBackend, Stylize, Terminal},
-    widgets::Paragraph,
-};
+use dispatcher::Dispatcher;
+use game_loader::GameLoader;
+use message::Message;
+
+use ui::UI;
+
+mod action;
+mod dispatcher;
+mod game_loader;
+mod message;
+mod model;
+mod ui;
 
 fn main() -> std::io::Result<()> {
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;
 
-    let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
-    terminal.clear()?;
+    let loader = GameLoader::new();
+
+    let (app_state_tx, app_state_rx) = std::sync::mpsc::channel();
+    let (ui_state_tx, ui_state_rx) = std::sync::mpsc::channel();
+
+    let mut ui = UI::new(ui_state_rx);
+    let mut dispatcher = Dispatcher::new(app_state_tx, ui_state_tx, loader);
 
     loop {
-        terminal.draw(|frame| {
-            let area = frame.size();
-            frame.render_widget(
-                Paragraph::new("Hello world! (press 'q' to quit)")
-                    .white()
-                    .on_blue(),
-                area,
-            );
-        })?;
-
-        if event::poll(std::time::Duration::from_millis(16))? {
-            if let event::Event::Key(key) = event::read()? {
-                if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('q') {
-                    break;
-                }
+        match app_state_rx.recv() {
+            Ok(Message::Terminate) => {
+                break;
+            }
+            Ok(_) => {}
+            Err(_) => {
+                break;
             }
         }
     }
+
+    dispatcher
+        .close()
+        .expect("Unable to rejoin dispatcher thread.");
+    ui.close().expect("Unable to rejoin UI thread.");
 
     stdout().execute(LeaveAlternateScreen)?;
     disable_raw_mode()?;
