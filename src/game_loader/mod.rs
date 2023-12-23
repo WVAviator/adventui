@@ -1,5 +1,7 @@
 // The game loader is responsible for loading responses to each user input and logically determine what actions should result
 
+use crate::action::Action;
+
 pub struct GameLoader {}
 
 impl GameLoader {
@@ -7,14 +9,29 @@ impl GameLoader {
         GameLoader {}
     }
 
-    pub fn process_input(&self, input: &str) -> String {
+    pub fn process_input(&self, input: &str) -> Action {
         match input {
-            "look" => "You are in a dark room. There is a door to the north. There are large windows to the south. There is a door to the east. There is a door to the west. There is a door to the up. There is a door to the down. There is a door to the northeast. There is a door to the northwest.".to_string(),
-            "north" => "You go north.".to_string(),
-            "south" => "You go south.".to_string(),
-            "east" => "You go east.".to_string(),
-            "west" => "You go west.".to_string(),
-            _ => "I don't understand.".to_string(),
+            "north" => Action::NewScene {
+                name: String::from("North"),
+                desc: String::from("You are in the north room."),
+            },
+            "get key" => Action::AddToInventory {
+                item: String::from("Key"),
+                message: String::from("You picked up a key."),
+            },
+            "use key" => Action::RemoveFromInventory {
+                item: String::from("Key"),
+                message: String::from("You used a key. It is now gone."),
+            },
+            "window" => Action::Information {
+                message: String::from("You look out the window. It is dark."),
+            },
+            "die" => Action::EndGame {
+                message: String::from("You died."),
+            },
+            _ => Action::Information {
+                message: String::from("I don't understand."),
+            },
         }
     }
 }

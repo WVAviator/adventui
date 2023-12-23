@@ -55,12 +55,34 @@ impl GameState {
         self.scroll_position -= amount;
     }
 
-    pub fn get_scroll_position(&self) -> usize {
-        self.scroll_position
-    }
-
     pub fn scroll_reset(&mut self) {
         self.scroll_position = 0;
+    }
+
+    pub fn new_scene(&mut self, name: String, desc: String) {
+        self.scene_name = name;
+        self.scene_desc = desc;
+        self.entry_enabled = true;
+        self.scene_history.clear();
+        self.scroll_reset();
+    }
+
+    pub fn add_to_inventory(&mut self, item: String) {
+        self.inventory.push(item);
+    }
+
+    pub fn remove_from_inventory(&mut self, item: String) {
+        self.inventory.retain(|i| i != &item);
+    }
+
+    pub fn disable_entry(&mut self) {
+        self.entry_enabled = false;
+    }
+
+    // Getters
+
+    pub fn get_scroll_position(&self) -> usize {
+        self.scroll_position
     }
 
     pub fn get_user_entry(&self) -> &str {

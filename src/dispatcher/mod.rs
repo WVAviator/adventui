@@ -2,6 +2,7 @@ use crossterm::event::{self, KeyCode, KeyEventKind};
 use std::{sync::mpsc::Sender, thread::JoinHandle};
 
 use crate::{
+    action::Action,
     game_loader::GameLoader,
     message::Message,
     model::{game_state::GameState, Model},
@@ -67,9 +68,29 @@ impl Dispatcher {
                                         state.remove_last_entry();
                                     }
                                     KeyCode::Enter => {
-                                        let response = loader.process_input(state.get_user_entry());
+                                        let action: Action =
+                                            loader.process_input(state.get_user_entry());
                                         state.push_input_to_history();
-                                        state.append_scene_history(response);
+                                        match action {
+                                            Action::NewScene { name, desc } => {
+                                                state.new_scene(name, desc);
+                                            }
+                                            Action::AddToInventory { item, message } => {
+                                                state.add_to_inventory(item);
+                                                state.append_scene_history(message);
+                                            }
+                                            Action::RemoveFromInventory { item, message } => {
+                                                state.remove_from_inventory(item);
+                                                state.append_scene_history(message);
+                                            }
+                                            Action::Information { message } => {
+                                                state.append_scene_history(message);
+                                            }
+                                            Action::EndGame { message } => {
+                                                state.append_scene_history(message);
+                                                state.disable_entry();
+                                            }
+                                        }
                                     }
                                     KeyCode::Up => {
                                         state.scroll_up(1);
